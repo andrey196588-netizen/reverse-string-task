@@ -2,7 +2,7 @@ package reverseTask;
 
 public class StringUntill {
     public static String reverseLetters(String input) {
-        char[] chars = "J@va the be$t!123".toCharArray();
+        char[] chars = input.toCharArray();
         int left = 0;
         int right = chars.length - 1;
         while (left < right) {
