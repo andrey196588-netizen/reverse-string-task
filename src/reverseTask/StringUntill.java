@@ -2,6 +2,9 @@ package reverseTask;
 
 public class StringUntill {
     public static String reverseLetters(String input) {
+        if (input==null){
+            return null;
+        }
         char[] chars = input.toCharArray();
         int left = 0;
         int right = chars.length - 1;
