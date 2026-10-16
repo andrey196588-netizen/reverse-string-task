@@ -34,3 +34,5 @@ private final int weight;
                 '}';
     }
 }
+// финальный код
+
