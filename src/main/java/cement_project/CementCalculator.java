@@ -1,30 +1,45 @@
 package cement_project;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CementCalculator {
-    public Map<String, Double>  calculateTotalCosts (List<Order> rawOrders){
-        Map<String, Double> companyCosts= new HashMap<>();
-        List<Order> sortedOrders = rawOrders.stream().sorted(Comparator.comparing(Order::getLocalDateTime)).toList();
 
-        double currentDiscount = 0.50;
-        final double discountStep = 0.05;
-        final double basePricePerKg = 10.0;
+    public Map<String, BigDecimal> calculateTotalCosts(List<Order> rawOrders) {
+        Map<String, BigDecimal> companyCosts = new HashMap<>();
 
-        for(Order order : sortedOrders){
-            double priceWithDiscount = basePricePerKg * (1.0 - currentDiscount);
-            double orderCost = order.getWeight() * priceWithDiscount;
-            companyCosts.merge(order.getCompanyName(), orderCost, Double::sum);
+        List<Order> sortedOrders = rawOrders.stream()
+                .sorted(Comparator.comparing(Order::localDateTime))
+                .toList();
 
-            currentDiscount -= discountStep;
+        BigDecimal currentDiscount = new BigDecimal("0.50");
+        final BigDecimal discountStep = new BigDecimal("0.05");
+        final BigDecimal basePricePerKg = new BigDecimal("10.0");
+        final BigDecimal coefficientFactor = new BigDecimal("1.8");
 
-            if (currentDiscount < 0) {
-                currentDiscount = 0;
+        for (Order order : sortedOrders) {
+            BigDecimal currentFactor = coefficientFactor.subtract(currentDiscount);
+
+            BigDecimal priceWithDiscount = basePricePerKg.multiply(currentFactor);
+
+            BigDecimal orderWeight = BigDecimal.valueOf(order.weight());
+            BigDecimal orderCost = orderWeight.multiply(priceWithDiscount);
+
+            companyCosts.merge(order.companyName(), orderCost, BigDecimal::add);
+
+            currentDiscount = currentDiscount.subtract(discountStep);
+
+            if (currentDiscount.compareTo(BigDecimal.ZERO) < 0) {
+                currentDiscount = BigDecimal.ZERO;
             }
         }
+
+        companyCosts.replaceAll((company, cost) -> cost.setScale(2, RoundingMode.HALF_UP));
+
         return companyCosts;
     }
-
 }
