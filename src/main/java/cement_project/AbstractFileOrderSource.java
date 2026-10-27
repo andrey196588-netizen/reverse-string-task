@@ -26,6 +26,11 @@ public abstract class AbstractFileOrderSource implements OrderSource {
 
                 String[] parts = line.split(delimiterRegex);
 
+                if (parts.length < 3) {
+                    System.out.println("Предупреждение: Пропущена некорректная строка в файле: " + line);
+                    continue;
+                }
+
                 LocalDateTime dateTime = LocalDateTime.parse(parts[0]);
                 String companyName = parts[1];
                 int weight = Integer.parseInt(parts[2]);

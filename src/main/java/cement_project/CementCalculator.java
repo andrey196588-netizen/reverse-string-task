@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class CementCalculator {
 
+    private static final BigDecimal INITIAL_DISCOUNT = new BigDecimal("0.50");
+    private static final BigDecimal DISCOUNT_STEP = new BigDecimal("0.05");
+    private static final BigDecimal BASE_PRICE_PER_KG = new BigDecimal("10.0");
+    private static final BigDecimal COEFFICIENT_FACTOR = new BigDecimal("1.8");
+
     public Map<String, BigDecimal> calculateTotalCosts(List<Order> rawOrders) {
         Map<String, BigDecimal> companyCosts = new HashMap<>();
 
@@ -16,22 +21,18 @@ public class CementCalculator {
                 .sorted(Comparator.comparing(Order::localDateTime))
                 .toList();
 
-        BigDecimal currentDiscount = new BigDecimal("0.50");
-        final BigDecimal discountStep = new BigDecimal("0.05");
-        final BigDecimal basePricePerKg = new BigDecimal("10.0");
-        final BigDecimal coefficientFactor = new BigDecimal("1.8");
+        BigDecimal currentDiscount = INITIAL_DISCOUNT;
 
         for (Order order : sortedOrders) {
-            BigDecimal currentFactor = coefficientFactor.subtract(currentDiscount);
-
-            BigDecimal priceWithDiscount = basePricePerKg.multiply(currentFactor);
+            BigDecimal currentFactor = COEFFICIENT_FACTOR.subtract(currentDiscount);
+            BigDecimal priceWithDiscount = BASE_PRICE_PER_KG.multiply(currentFactor);
 
             BigDecimal orderWeight = BigDecimal.valueOf(order.weight());
             BigDecimal orderCost = orderWeight.multiply(priceWithDiscount);
 
             companyCosts.merge(order.companyName(), orderCost, BigDecimal::add);
 
-            currentDiscount = currentDiscount.subtract(discountStep);
+            currentDiscount = currentDiscount.subtract(DISCOUNT_STEP);
 
             if (currentDiscount.compareTo(BigDecimal.ZERO) < 0) {
                 currentDiscount = BigDecimal.ZERO;

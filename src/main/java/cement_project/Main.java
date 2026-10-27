@@ -1,6 +1,9 @@
 package cement_project;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +32,9 @@ public class Main {
         finalCosts.forEach((company, totalCost) -> linesToSave.add(company + " - " + totalCost));
 
         try {
-            java.nio.file.Files.write(java.nio.file.Path.of("result.txt"), linesToSave);
+            Files.write(Path.of("result.txt"), linesToSave);
             System.out.println("\nРезультаты сохранены в файл result.txt");
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             System.out.println("Не удалось сохранить файл: " + e.getMessage());
         }
     }
