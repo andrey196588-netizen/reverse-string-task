@@ -1,5 +1,9 @@
 package cement_project;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,20 +19,22 @@ public class Main {
         allOrders.addAll(hashSource.getOrders());
 
         System.out.println("Всего успешно прочитано заказов из двух файлов: " + allOrders.size());
-
         System.out.println("\n--- ЗАПУСК РАСЧЕТА СКИДКИ И ГРУППИРОВКИ ---");
 
         CementCalculator calculator = new CementCalculator();
-        Map<String, Double> finalCosts = calculator.calculateTotalCosts(allOrders);
+        Map<String, BigDecimal> finalCosts = calculator.calculateTotalCosts(allOrders);
 
         finalCosts.forEach((company, totalCost) ->
-                System.out.printf("Компания: %-15s | Итоговая сумма к оплате: %,.2f руб.%n", company, totalCost));
+                System.out.printf("Компания: %-15s | Итоговая сумма к оплате: %s руб.%n", company, totalCost)
+        );
+
         List<String> linesToSave = new ArrayList<>();
         finalCosts.forEach((company, totalCost) -> linesToSave.add(company + " - " + totalCost));
+
         try {
-            java.nio.file.Files.write(java.nio.file.Path.of("result.txt"), linesToSave);
-            System.out.println("\n Результаты сохранены в файл result.txt!");
-        } catch (java.io.IOException e) {
+            Files.write(Path.of("result.txt"), linesToSave);
+            System.out.println("\nРезультаты сохранены в файл result.txt");
+        } catch (IOException e) {
             System.out.println("Не удалось сохранить файл: " + e.getMessage());
         }
     }
